@@ -21,8 +21,8 @@ function inicioCalculadora() {
         return;
     }
 
-    while (!nombreApellido) {
-        alert("Debe ingresar su nombre y apellido.");
+    while (!nombreApellido || !/^[A-Za-z\s]+$/.test(nombreApellido)) {
+        alert("Debe ingresar un nombre y apellido válido (sólo letras y espacios).");
         nombreApellido = prompt("Ingrese su nombre y apellido:");
         if (nombreApellido === null) {
             return;
@@ -42,7 +42,7 @@ function inicioCalculadora() {
     }
 
     while (!dni || isNaN(Number(dni))) {
-        alert("Debe ingresar un número de DNI válido.");
+        alert("Debe ingresar un número de DNI válido (sólo numeros).");
         dni = prompt("Ingrese su número de DNI:");
         if (dni === null) {
             return;
