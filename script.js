@@ -15,42 +15,49 @@ let divisa = [
 let inicioDeCalculadora = inicioCalculadora();
 
 function inicioCalculadora() {
-  let nombreApellido = prompt("Ingrese su nombre y apellido:");
+    let nombreApellido = prompt("Ingrese su nombre y apellido:");
 
-  if (nombreApellido === null) {
-    return;
-  }
-
-  while (!nombreApellido) {
-    alert("Debe ingresar su nombre y apellido.");
-    nombreApellido = prompt("Ingrese su nombre y apellido:");
     if (nombreApellido === null) {
-      return;
+        return;
     }
-  }
 
-  let dni = prompt("Ingrese su número de DNI:");
+    while (!nombreApellido) {
+        alert("Debe ingresar su nombre y apellido.");
+        nombreApellido = prompt("Ingrese su nombre y apellido:");
+        if (nombreApellido === null) {
+            return;
+        }
+    }
 
-  if (dni === null) {
-    return;
-  }
+    const nombre = nombreApellido.split(' ');
+    for (let i = 0; i < nombre.length; i++) {
+        nombre[i] = nombre[i].charAt(0).toUpperCase() + nombre[i].slice(1).toLowerCase();
+    }
+    nombreApellido = nombre.join(' ');
 
-  while (!dni || isNaN(Number(dni))) {
-    alert("Debe ingresar un número de DNI válido.");
-    dni = prompt("Ingrese su número de DNI:");
+    let dni = prompt("Ingrese su número de DNI:");
+
     if (dni === null) {
-      return;
+        return;
     }
-  }
 
-  alert(`Bienvenido ${nombreApellido} DNI: ${dni} a la calculadora de divisas\n\nAFIP le agradece sus datos.`);
-  seleccionContinente();
+    while (!dni || isNaN(Number(dni))) {
+        alert("Debe ingresar un número de DNI válido.");
+        dni = prompt("Ingrese su número de DNI:");
+        if (dni === null) {
+            return;
+        }
+    }
+
+    alert(`Bienvenido ${nombreApellido} DNI: ${dni} a la calculadora de divisas.\n\nAFIP le agradece sus datos.`);
+    seleccionContinente();
 }
 
 function seleccionContinente() {
-    let respuestaContinente = prompt('¿De qué continente desea buscar divisas?\n(Ingrese solo números)\n\n1) América\n2) Europa\n3) Asia\n4) Oceanía\n\nHaga clic en "Cancelar" para salir');
+    let respuestaContinente = prompt('¿De qué continente desea buscar divisas?\n(Ingrese sólo números)\n\n1) América\n2) Europa\n3) Asia\n4) Oceanía\n\nHaga clic en "Cancelar" para salir');
 
     if (respuestaContinente === null) {
+        reiniciarCalculadora()
         return
     }
 
@@ -62,15 +69,9 @@ function seleccionContinente() {
     } else if (respuestaContinente < 1 || respuestaContinente > 4) {
         alert("Ingrese solo números correspondientes a las opciones mostradas");
         seleccionContinente();
-    }
-
-    let continenteElegido = divisa.filter(divisa => divisa.continente.toLowerCase() === obtenerNombreContinente(respuestaContinente).toLowerCase());
-
-    if (continenteElegido.length > 0) {
-        seleccionDivisas(continenteElegido);
     } else {
-        alert("No se encontraron divisas para el continente seleccionado");
-        seleccionContinente();
+        let continenteElegido = obtenerNombreContinente(respuestaContinente);
+        seleccionDivisas(continenteElegido);
     }
 }
 
@@ -89,12 +90,13 @@ function obtenerNombreContinente(numeroContinente) {
     }
 }
 
-function seleccionDivisas(divisas) {
+function seleccionDivisas(continente) {
     let opcionesDivisas = "";
+    let divisasContinente = divisa.filter(divisa => divisa.continente.toLowerCase() === continente.toLowerCase());
 
-    divisas.forEach((divisa) => { opcionesDivisas += `${divisa.id}) ${divisa.nombre} - ${divisa.pais}\n` });
+    divisasContinente.forEach((divisa) => { opcionesDivisas += `${divisa.id}) ${divisa.nombre} - ${divisa.pais}\n` });
 
-    let respuestaDivisa = prompt(`Seleccione la divisa deseada:\n(Ingrese sólo números)\n\n${opcionesDivisas}\n\nHaga clic en "Cancelar" para volver al menú anterior`);
+    let respuestaDivisa = prompt(`Seleccione la divisa deseada del continente ${continente}:\n(Ingrese sólo números)\n\n${opcionesDivisas}\n\nHaga clic en "Cancelar" para volver al menú anterior`);
 
     if (respuestaDivisa === null) {
         seleccionContinente();
@@ -105,20 +107,20 @@ function seleccionDivisas(divisas) {
 
     if (isNaN(respuestaDivisa)) {
         alert("Ingrese solo números");
-        seleccionDivisas(divisas);
+        seleccionDivisas(continente);
         return;
     } else if (respuestaDivisa === 0) {
         seleccionContinente();
         return;
     }
 
-    let divisaElegida = divisas.find((divisa) => divisa.id === respuestaDivisa);
+    let divisaElegida = divisasContinente.find((divisa) => divisa.id === respuestaDivisa);
 
     if (divisaElegida) {
         let conversion = prompt(`${divisaElegida.nombre.toUpperCase()} \n\nIngrese 1 para convertir de ${divisaElegida.nombre} a pesos argentinos.\nIngrese 2 para convertir de pesos argentinos a ${divisaElegida.nombre}.\n\nHaga clic en "Cancelar" para volver al menú anterior`);
 
         if (conversion === null) {
-            seleccionDivisas(divisas);
+            seleccionDivisas(continente);
             return;
         }
 
@@ -132,14 +134,13 @@ function seleccionDivisas(divisas) {
             seleccionContinente();
         } else {
             alert("Ingrese solo los números correspondientes a las opciones mostradas");
-            seleccionDivisas(divisas);
+            seleccionDivisas(continente);
         }
     } else {
         alert("Ingrese solo números correspondientes a las opciones mostradas");
-        seleccionDivisas(divisas);
+        seleccionDivisas(continente);
     }
 }
-
 
 function convertirAPesosArgentinos(divisa) {
     let cantidadDivisa = prompt(
@@ -203,7 +204,6 @@ function calcularValorEnPesos(divisa) {
 
     reiniciarCalculadora();
 }
-
 
 function reiniciarCalculadora() {
     let reiniciar = confirm("¿Desea realizar otra conversión?");
